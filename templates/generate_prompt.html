@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prompt Generator | AI Hub</title>
+  <meta name="description" content="Discover a collection of powerful AI tools designed to simplify your daily tasks, boost productivity, and spark creativity. Your personal AI assistant is here to help."/>
+  <meta name="keywords" content="ai tools, artificial intelligence, productivity tools, personal assistant, content creation, ai helper, daily tasks, free ai tools, optmize prompt, prompting, prompt generator"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js' defer></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <!-- Header -->
+  <main>
+    <section id="prompt-genie-tool" class="ai-tool-body min-h-[75vh] flex flex-col items-center justify-center p-4">
+      <div class="container mx-auto px-4">
+        <div class="bg-white shadow-2xl rounded-2xl p-6 md:p-10 max-w-2xl w-full mx-auto space-y-6">
+          <div class="text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800">🧞 Prompt Genie</h1>
+            <p class="text-gray-600 mt-2">Turn your simple ideas into powerful, detailed prompts.</p>
+          </div>
+            <!-- Provider Dropdown -->
+          <div>
+            <label for="provider" class="block text-sm font-medium text-gray-700 mb-2">Choose Provider:</label>
+            <select id="provider" class="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:outline-none form-input">
+                <option value="vision">Vision</option>
+                <option value="together" selected>Meta-Llama</option>
+                <option value="Mistral">Mistral</option>
+            </select>
+          </div>
+
+          <!-- Task Textarea -->
+          <div>
+            <label for="task" class="block text-sm font-medium text-gray-700 mb-2">Your Task:</label>
+            <textarea id="task" rows="6" spellcheck="true" placeholder="e.g., 'Write a blog post about the benefits of remote work'" class="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:outline-none resize-y form-input"></textarea>
+          </div>
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <button onclick="generateShortPrompt()" class="w-full px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-semibold animated-button">
+                Generate Short Prompt
+            </button>
+            <button onclick="generatePrompt()" class="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold animated-button">
+                Generate Detailed Prompt
+            </button>
+          </div>            
+          <!-- Loading Spinner -->
+          <div id="loadingSpinner" class="flex justify-center mt-4 hidden">
+            <div class="animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent">
+              
+            </div>
+          </div>
+          <!-- Result Section -->
+          <div id="resultSection" class="hidden">
+            <h2 class="text-lg font-semibold text-gray-800 mb-2">Optimized Prompt:</h2>
+            <pre id="result" class="bg-gray-100 p-4 rounded-lg border border-gray-200 text-sm text-gray-700 whitespace-pre-wrap font-mono"></pre>     
+            <!-- Copy Button -->
+            <div id="copyButtonContainer" class="text-center mt-4">
+              <button onclick="copyToClipboard()" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200 font-medium animated-button">
+                📋 Copy to Clipboard
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main> 
+  <!-- Footer -->
+  <footer id="contact" class="bg-gray-800 text-white py-12">
+    <div class="container mx-auto px-6 text-center">
+        <p>&copy; 2025 AI Hub. All Rights Reserved.</p>
+    </div>
+  </footer>
+  <script src="/static/main.js" defer></script>
+</body>
+</html>
