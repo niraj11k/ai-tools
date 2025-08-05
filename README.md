@@ -34,12 +34,30 @@ Securely Managing Your Gemini API Key:
             *.pyo
 Core Application Logic Development
     Project Structure:
-        ai-tools/
-        ├── venv/                     # Virtual environment directory
-        ├── app.py                    # Main application logic (Flask app)
-        ├── .env                      # Stores your API key (DO NOT COMMIT)
-        ├── requirements.txt          # Lists project dependencies
-        └── .gitignore                # Specifies intentionally untracked files for Git
+        ```
+ai-tools
+├─ app
+│  ├─ api
+│  │  ├─ chatbot_routes.py
+│  │  └─ __init__.py
+│  ├─ core
+│  │  ├─ chatbot_handler.py
+│  │  └─ __init__.py
+│  ├─ main.py
+│  ├─ models
+│  │  ├─ chatbot_models.py
+│  │  └─ __init__.py
+│  ├─ prompt_generator.py
+│  ├─ static
+│  │  ├─ main.js
+│  │  └─ style.css
+│  └─ templates
+├─ README.md
+├─ requirements.txt
+└─ templates
+   └─ generate_prompt.html
+
+``` Git
     Note: You can generate requirements.txt later by running pip freeze > requirements.txt in your activated virtual environment.
 
 Run the Project locally

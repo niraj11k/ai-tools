@@ -109,3 +109,118 @@
       }
     document.body.removeChild(textArea);
   }
+  // Chatbot logic
+  const chatbotPopupButton = document.getElementById('chatbot-popup-button');
+  const chatbotWindow = document.getElementById('chatbot-window');
+  const closeChatbotButton = document.getElementById('close-chatbot-button');
+  const chatbotForm = document.getElementById('chatbot-form');
+  const chatbotInput = document.getElementById('chatbot-input');
+  const chatbotBody = document.getElementById('chatbot-body');
+  const predefinedServicesContainer = document.getElementById('predefined-services');
+  API_BASE_URL = window.location.origin;
+
+  const toggleChatbot = () => {
+    chatbotWindow.classList.toggle('hidden-chatbot');
+  };
+
+  if (chatbotPopupButton) {
+    chatbotPopupButton.addEventListener('click', toggleChatbot);
+    closeChatbotButton.addEventListener('click', toggleChatbot);
+  }
+
+  const addMessage = (text, sender) => {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `chatbot-message ${sender}-message`;
+
+    if (sender === 'bot') {
+        messageDiv.innerHTML = marked.parse(text);
+    } else {
+        messageDiv.textContent = text;
+    }
+
+    chatbotBody.appendChild(messageDiv);
+    chatbotBody.scrollTop = chatbotBody.scrollHeight;
+  };
+      
+  const showTypingIndicator = () => {
+    const typingDiv = document.createElement('div');
+    typingDiv.id = 'typing-indicator';
+    typingDiv.className = 'bot-message chatbot-message';
+    typingDiv.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
+    chatbotBody.appendChild(typingDiv);
+    chatbotBody.scrollTop = chatbotBody.scrollHeight;
+  };
+  
+  const removeTypingIndicator = () => {
+    const indicator = document.getElementById('typing-indicator');
+    if (indicator) {
+        indicator.remove();
+    }
+  };
+
+  const handleUserQuery = async (userMessage) => {
+    if (!userMessage) return;
+
+    addMessage(userMessage, 'user');
+    chatbotInput.value = ''; // Clear input immediately
+    
+    if (predefinedServicesContainer) {
+        // Remove the services container from its current position
+        predefinedServicesContainer.remove();
+    }
+      
+    showTypingIndicator();
+    // --- Backend Communication ---
+    try {
+        // Replace with your actual FastAPI endpoint
+        const response = await fetch(`${API_BASE_URL}/api/chat`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: userMessage }),
+        });
+
+        removeTypingIndicator();
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+            
+        }
+
+        const data = await response.json();
+        const botMessage = data.reply; // Adjust based on your API response structure
+
+        addMessage(botMessage, 'bot');
+
+    } catch (error) {
+        removeTypingIndicator();
+        console.error('Error communicating with chatbot backend:', error);
+        addMessage("Sorry, I'm having trouble connecting. Please try again later.", 'bot');
+    } finally {
+      // Always show the services after a query, whether it succeeds or fails.
+      console.log("Showing predefined services...");
+      if (predefinedServicesContainer) {
+        chatbotBody.appendChild(predefinedServicesContainer);
+        chatbotBody.scrollTop = chatbotBody.scrollHeight;
+      }
+    }
+  };
+
+  if (chatbotForm) {
+    chatbotForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const userMessage = chatbotInput.value.trim();
+      handleUserQuery(userMessage);
+    });
+  }
+
+  if (predefinedServicesContainer) {
+    predefinedServicesContainer.addEventListener('click', (event) => {
+      if (event.target.classList.contains('predefined-service-button')) {
+          const serviceText = event.target.getAttribute('data-service');
+          chatbotInput.value = serviceText;
+          chatbotInput.focus();
+      }
+    });
+  }
