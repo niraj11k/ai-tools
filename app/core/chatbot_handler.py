@@ -161,13 +161,7 @@ async def improve_chatbot_prompt(prompt: str) -> str:
             logging.warning(f"Error processing stream: {stream_error}")
         
         if full_content.strip():
-            content = full_content.strip()
-            if isinstance(content, str):
-                return content
-            elif isinstance(content, list):
-                return " ".join(str(item) for item in content)
-            else:
-                return str(content)
+            return full_content.strip()
         else:
             raise RuntimeError("No content received from AI service.")
     except httpx.HTTPStatusError as e:
@@ -227,13 +221,7 @@ async def ask_gpt(question: str) -> str:
             logging.warning(f"Error processing stream: {stream_error}")
         
         if full_content.strip():
-            content = full_content.strip()
-            if isinstance(content, str):
-                return content
-            elif isinstance(content, list):
-                return " ".join(str(item) for item in content)
-            else:
-                return str(content)
+            return full_content.strip()
         else:
             raise RuntimeError("No content received from AI service.")
     except httpx.HTTPStatusError as e:    
