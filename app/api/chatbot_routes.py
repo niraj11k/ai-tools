@@ -1,10 +1,9 @@
-# chatbot-route.py
+"""Chatbot routes."""
 
 from fastapi import APIRouter
 
-# Import the request/response models and the handler function
-from ..models.chatbot_models  import ChatbotRequest, ChatbotResponse
 from ..core.chatbot_handler import process_chat_message
+from ..models.chatbot_models import ChatbotRequest, ChatbotResponse
 
 # Create a new router
 router = APIRouter()

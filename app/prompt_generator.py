@@ -1,7 +1,8 @@
 # app/prompt_creator.py
 import os
-import requests
+
 from dotenv import load_dotenv
+import requests
 from together import Together
 
 
@@ -47,11 +48,13 @@ def create_prompt(task_description: str, provider: str) -> str:
     
     # The system prompt is updated to request Markdown output with specific headings.
     system_prompt = (
-        "You are a senior prompt engineer. Transform the user's request into a structured,"
+        "You are a senior prompt engineer. Transform the user's request into a "
+        "structured,"
         " professional prompt in Markdown with the following sections:"
         "\n\n### Persona\nDescribe the relevant role."
         "\n\n### Task\nRewrite the user request as a clear instruction."
-        "\n\n### Constraints\nList concrete requirements, acceptance criteria, and boundaries."
+        "\n\n### Constraints\nList concrete requirements, acceptance criteria, "
+        "and boundaries."
         "\n\n### Audience (include only if explicitly provided)"
         "\n\n### Tone & Style (include only if explicitly provided)"
     )
@@ -77,9 +80,23 @@ def create_prompt(task_description: str, provider: str) -> str:
             payload = {
                 "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
                 "messages": [
-                    {"role": "system", "content": "You have to convert the user prompt prompt that will get an output at a professional level. Assume a appropirate role before sending me the prompt, review it yourself and optimize to make it extremely detailed."},
-                    {"role": "user", "content": f"Here is the user prompt: {task_description}"}
-                ]
+                    {
+                        "role": "system",
+                        "content": (
+                            "You have to convert the user prompt prompt that will get an "
+                            "output at a professional level. Assume an appropriate role "
+                            "before sending me the prompt, review it yourself and optimize "
+                            "to make it extremely detailed."
+                        ),
+                    },
+                    {
+                        "role": "user",
+                        "content": (
+                            "Here is the user prompt: "
+                            f"{task_description}"
+                        ),
+                    },
+                ],
             }
             response = requests.post(url, headers=headers, json=payload)
             response.raise_for_status()
@@ -108,10 +125,24 @@ def create_short_prompt(task_description: str, provider: str) -> str:
             response = client.chat.completions.create(
                 model="openai/gpt-oss-20b",
                 messages=[
-                    {"role": "system", "content": "You have to convert the user prompt that will get an output at a professional level. Before sending me the prompt, review it yourself and optimize to make it under 101 tokens." },
-                    {"role": "user", "content": f"Here is the task for which you need to optimize the prompt:: {task_description}"}
+                    {
+                        "role": "system",
+                        "content": (
+                            "You have to convert the user prompt that will get an output "
+                            "at a professional level. Before sending me the prompt, review "
+                            "it yourself and optimize to make it under 101 tokens."
+                        ),
+                    },
+                    {
+                        "role": "user",
+                        "content": (
+                            "Here is the task for which "
+                            "you need to optimize the prompt: "
+                            f"{task_description}"
+                        ),
+                    },
                 ],
-                max_tokens=100
+                max_tokens=100,
             )
             return _safe_extract_content(response)
         elif provider == "llama":
@@ -123,10 +154,24 @@ def create_short_prompt(task_description: str, provider: str) -> str:
             payload = {
                 "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
                 "messages": [
-                    {"role": "system", "content": "You have to convert the user prompt that will get an output at a professional level. Before sending me the prompt, review it yourself and optimize to make it under 101 tokens."},
-                    {"role": "user", "content": f"Here is the task for which you need to write the prompt: {task_description}"}
+                    {
+                        "role": "system",
+                        "content": (
+                            "You have to convert the user prompt that will get an output "
+                            "at a professional level. Before sending me the prompt, review "
+                            "it yourself and optimize to make it under 101 tokens."
+                        ),
+                    },
+                    {
+                        "role": "user",
+                        "content": (
+                            "Here is the task for which "
+                            "you need to write the prompt: "
+                            f"{task_description}"
+                        ),
+                    },
                 ],
-                "max_tokens": 100
+                "max_tokens": 100,
             }
             response = requests.post(url, headers=headers, json=payload)
             response.raise_for_status()
@@ -135,10 +180,17 @@ def create_short_prompt(task_description: str, provider: str) -> str:
             response = client.chat.completions.create(
                 model="google/gemma-3n-E4B-it",
                 messages=[
-                    {"role": "system", "content": "You have to convert the user prompt that will get an output at a professional level. Before sending me the prompt, review it yourself and optimize to make it under 101 tokens." },
-                    {"role": "user", "content": f"user prompt: {task_description}"}
+                    {
+                        "role": "system",
+                        "content": (
+                            "You have to convert the user prompt that will get an output "
+                            "at a professional level. Before sending me the prompt, review "
+                            "it yourself and optimize to make it under 101 tokens."
+                        ),
+                    },
+                    {"role": "user", "content": f"user prompt: {task_description}"},
                 ],
-                max_tokens=100
+                max_tokens=100,
             )
             return _safe_extract_content(response)
         else:

@@ -1,13 +1,14 @@
 # main.py
+import os
+
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
-from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from app.prompt_generator import create_prompt ,create_short_prompt
+
 from app.api.chatbot_routes import router as chatbot_router
-import os
+from app.prompt_generator import create_prompt, create_short_prompt
 
 # load_dotenv()  # Load .env variables
 

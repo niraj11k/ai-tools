@@ -1,8 +1,9 @@
+import asyncio
 import logging
+from pathlib import Path
+
 import httpx
 from together import Together
-import asyncio
-from pathlib import Path
 
 # Ensure logs are written to the project root (AI-tools)
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -146,8 +147,9 @@ async def improve_chatbot_prompt(prompt: str) -> str:
             raise RuntimeError("No content received from AI service.")
     except httpx.HTTPStatusError as e:
         logging.error(f"HTTP error occurred: {e}")
+        status = getattr(getattr(e, "response", None), "status_code", "unknown")
         raise RuntimeError(
-            f"Sorry, I encountered an error with the AI service: {e.response.status_code}"
+            f"Sorry, I encountered an error with the AI service: {status}"
         )
     except Exception as e:
         logging.error(f"An unexpected error occurred: {e}")
@@ -184,16 +186,18 @@ async def ask_gpt(question: str) -> str:
             raise RuntimeError("No content received from AI service.")
     except httpx.HTTPStatusError as e:    
         logging.error(f"HTTP error occurred: {e}")
+        status = getattr(getattr(e, "response", None), "status_code", "unknown")
         raise RuntimeError(
-            f"Sorry, I encountered an error with the AI service: {e.response.status_code}"
+            f"Sorry, I encountered an error with the AI service: {status}"
         )
     except Exception as e:
         logging.error(f"An unexpected error occurred: {e}")
-        raise RuntimeError("Sorry, I encountered an unexpected error. Please try again later.")
+        raise RuntimeError(
+            "Sorry, I encountered an unexpected error. "
+            "Please try again later."
+        )
 async def process_chat_message(message: str) -> str:
-    """
-    The main async handler function. It routes the user's message to the correct service.
-    """
+    """Routes the user's message to the correct service."""
     if message.lower().startswith("improve my prompt:"):
         user_prompt = message[len("improve my prompt:"):].strip()
         logging.info(f"Async: Improving prompt: {user_prompt}") 
