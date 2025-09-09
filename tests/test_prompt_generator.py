@@ -22,16 +22,23 @@ def test_create_prompt_llama_success(monkeypatch):
             return self._data
 
     def fake_post(url, headers=None, json=None, timeout=None):
-        return DummyResp({
-            "choices": [
-                {"message": {"content": "TOGETHER DETAILED OK"}}
-            ]
-        })
+        return DummyResp(
+            {
+                "choices": [
+                    {
+                        "message": {
+                            "content": "TOGETHER DETAILED OK",
+                        }
+                    }
+                ],
+            }
+        )
 
     monkeypatch.setattr(pg.requests, "post", fake_post)
 
     out = pg.create_prompt("write a poem", "llama")
     assert out == "TOGETHER DETAILED OK"
+
 
 
 def test_create_short_prompt_llama_success(monkeypatch):
@@ -49,16 +56,23 @@ def test_create_short_prompt_llama_success(monkeypatch):
             return self._data
 
     def fake_post(url, headers=None, json=None, timeout=None):
-        return DummyResp({
-            "choices": [
-                {"message": {"content": "TOGETHER SHORT OK"}}
-            ]
-        })
+        return DummyResp(
+            {
+                "choices": [
+                    {
+                        "message": {
+                            "content": "TOGETHER SHORT OK",
+                        }
+                    }
+                ],
+            }
+        )
 
     monkeypatch.setattr(pg.requests, "post", fake_post)
 
     out = pg.create_short_prompt("summarize text", "llama")
     assert out == "TOGETHER SHORT OK"
+
 
 
 def test_create_prompt_openai_uses_sdk(monkeypatch):
@@ -89,6 +103,7 @@ def test_create_prompt_openai_uses_sdk(monkeypatch):
     monkeypatch.setattr(pg, "client", FakeClient())
     out = pg.create_prompt("describe an image", "openai")
     assert out == "VISION OK"
+
 
 
 def test_create_prompt_gemma_uses_sdk(monkeypatch):
