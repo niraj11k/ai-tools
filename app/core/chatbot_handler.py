@@ -21,6 +21,7 @@ logging.basicConfig(
 # load_dotenv()
 client = Together()  # Uses TOGETHER_API_KEY from environment
 
+
 async def improve_chatbot_prompt(prompt: str) -> str:   
     # The system prompt is updated to request Markdown output with specific headings.
     await asyncio.sleep(1)
@@ -154,6 +155,8 @@ async def improve_chatbot_prompt(prompt: str) -> str:
     except Exception as e:
         logging.error(f"An unexpected error occurred: {e}")
         raise RuntimeError("Sorry, I encountered an unexpected error. Please try again later.")
+
+
 async def search_internet(query: str) -> str:
     """
     Simulates an async search on the internet.
@@ -161,6 +164,7 @@ async def search_internet(query: str) -> str:
     print(f"Async: Searching internet for: {query}")
     await asyncio.sleep(0.5) # Simulates network delay
     return f"Searching the web for '{query}'... Here are the top results I found."
+
 
 async def ask_gpt(question: str) -> str:
     logging.info(f"Async: Asking dummy GPT model: {question}")
@@ -196,6 +200,8 @@ async def ask_gpt(question: str) -> str:
             "Sorry, I encountered an unexpected error. "
             "Please try again later."
         )
+
+
 async def process_chat_message(message: str) -> str:
     """Routes the user's message to the correct service."""
     if message.lower().startswith("improve my prompt:"):
