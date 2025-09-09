@@ -134,10 +134,34 @@ async def improve_chatbot_prompt(prompt: str) -> str:
                 {"role": "user", "content": f"user prompt: {prompt}"}
             ],
             max_tokens=1000,
-            stream=False
+            stream=True
         )
-        if response.choices and response.choices[0].message.content:  # type: ignore
-            content = response.choices[0].message.content  # type: ignore
+        
+        # Collect all chunks from the streaming response
+        full_content = ""
+        try:
+            for chunk in response:
+                # Handle different response formats from Together API
+                if isinstance(chunk, tuple):
+                    # If chunk is a tuple, try to extract content from it
+                    chunk_data = chunk[1] if len(chunk) > 1 else chunk[0]
+                    if hasattr(chunk_data, 'choices'):
+                        choices = chunk_data.choices
+                    else:
+                        continue
+                else:
+                    # Standard chunk format
+                    choices = getattr(chunk, 'choices', None)
+                
+                if choices and len(choices) > 0:
+                    delta = getattr(choices[0], 'delta', None)
+                    if delta and hasattr(delta, 'content') and delta.content:
+                        full_content += delta.content
+        except Exception as stream_error:
+            logging.warning(f"Error processing stream: {stream_error}")
+        
+        if full_content.strip():
+            content = full_content.strip()
             if isinstance(content, str):
                 return content
             elif isinstance(content, list):
@@ -176,10 +200,34 @@ async def ask_gpt(question: str) -> str:
                 {"role": "system", "content": question },
             ],
             max_tokens=1000,
-            stream=False
+            stream=True
         )
-        if response.choices and response.choices[0].message.content:  # type: ignore
-            content = response.choices[0].message.content  # type: ignore
+        
+        # Collect all chunks from the streaming response
+        full_content = ""
+        try:
+            for chunk in response:
+                # Handle different response formats from Together API
+                if isinstance(chunk, tuple):
+                    # If chunk is a tuple, try to extract content from it
+                    chunk_data = chunk[1] if len(chunk) > 1 else chunk[0]
+                    if hasattr(chunk_data, 'choices'):
+                        choices = chunk_data.choices
+                    else:
+                        continue
+                else:
+                    # Standard chunk format
+                    choices = getattr(chunk, 'choices', None)
+                
+                if choices and len(choices) > 0:
+                    delta = getattr(choices[0], 'delta', None)
+                    if delta and hasattr(delta, 'content') and delta.content:
+                        full_content += delta.content
+        except Exception as stream_error:
+            logging.warning(f"Error processing stream: {stream_error}")
+        
+        if full_content.strip():
+            content = full_content.strip()
             if isinstance(content, str):
                 return content
             elif isinstance(content, list):
