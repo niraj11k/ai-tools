@@ -1,32 +1,28 @@
-import asyncio
 import logging
-from pathlib import Path
-
 import httpx
 from together import Together
-
-# Ensure logs are written to the project root (AI-tools)
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-LOG_FILE = PROJECT_ROOT / "chatbot_handler.log"
+import asyncio
+import json
+from ..models.chatbot_models import ChatbotResponse
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler(str(LOG_FILE)),
-    ]
+        logging.FileHandler("log/prompt-genie/meme_handler.log"),
+        logging.StreamHandler()     
+    ]   
 )
 
 # load_dotenv()
 client = Together()  # Uses TOGETHER_API_KEY from environment
 
-
-async def improve_chatbot_prompt(prompt: str) -> str:   
+async def improve_chatbot_prompt(prompt: str) -> ChatbotResponse:   
     # The system prompt is updated to request Markdown output with specific headings.
     await asyncio.sleep(1)
     system_prompt = """
-                    ##You are Vani, a master-level AI prompt optimization specialist. Your mission: transform any user prompt into precision-crafted prompts that unlock AI's full potential across all platforms.
+                    ##You are Orion, a master-level AI prompt optimization specialist. Your mission: transform any user prompt into precision-crafted prompts that unlock AI's full potential across all platforms.
                     ## THE 4-D METHODOLOGY
 
                     ### 1. DECONSTRUCT
@@ -102,7 +98,7 @@ async def improve_chatbot_prompt(prompt: str) -> str:
 
                     When activated, display EXACTLY:
 
-                    "Hello! I'm Vani, your AI prompt optimizer. I transform vague requests into precise, effective prompts that deliver better results.
+                    "Hello! I'm Lyra, your AI prompt optimizer. I transform vague requests into precise, effective prompts that deliver better results.
 
                     **What I need to know:**  
                     *Target AI:* ChatGPT, Claude, Gemini, or Other  
@@ -133,48 +129,15 @@ async def improve_chatbot_prompt(prompt: str) -> str:
                 {"role": "system", "content": system_prompt },
                 {"role": "user", "content": f"user prompt: {prompt}"}
             ],
-            max_tokens=1000,
-            stream=True
+            # max_tokens=1000
         )
-        
-        # Collect all chunks from the streaming response
-        full_content = ""
-        try:
-            for chunk in response:
-                # Handle different response formats from Together API
-                if isinstance(chunk, tuple):
-                    # If chunk is a tuple, try to extract content from it
-                    chunk_data = chunk[1] if len(chunk) > 1 else chunk[0]
-                    if hasattr(chunk_data, 'choices'):
-                        choices = chunk_data.choices
-                    else:
-                        continue
-                else:
-                    # Standard chunk format
-                    choices = getattr(chunk, 'choices', None)
-                
-                if choices and len(choices) > 0:
-                    delta = getattr(choices[0], 'delta', None)
-                    if delta and hasattr(delta, 'content') and delta.content:
-                        full_content += delta.content
-        except Exception as stream_error:
-            logging.warning(f"Error processing stream: {stream_error}")
-        
-        if full_content.strip():
-            return full_content.strip()
-        else:
-            raise RuntimeError("No content received from AI service.")
+        return response.choices[0].message.content
     except httpx.HTTPStatusError as e:
         logging.error(f"HTTP error occurred: {e}")
-        status = getattr(getattr(e, "response", None), "status_code", "unknown")
-        raise RuntimeError(
-            f"Sorry, I encountered an error with the AI service: {status}"
-        )
+        raise f"Sorry, I encountered an error with the AI service: {e.response.status_code}"
     except Exception as e:
         logging.error(f"An unexpected error occurred: {e}")
-        raise RuntimeError("Sorry, I encountered an unexpected error. Please try again later.")
-
-
+        raise f"Sorry, I encountered an unexpected error. Please try again later."
 async def search_internet(query: str) -> str:
     """
     Simulates an async search on the internet.
@@ -183,63 +146,28 @@ async def search_internet(query: str) -> str:
     await asyncio.sleep(0.5) # Simulates network delay
     return f"Searching the web for '{query}'... Here are the top results I found."
 
-
-async def ask_gpt(question: str) -> str:
+async def ask_gpt(question: str) -> ChatbotResponse:
     logging.info(f"Async: Asking dummy GPT model: {question}")
     await asyncio.sleep(0.5) # Simulates network delay
     try:
         response = client.chat.completions.create(
-            model="openai/gpt-oss-20b",
+            model="meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
             messages=[
                 {"role": "system", "content": question },
             ],
-            max_tokens=1000,
-            stream=True
+            max_tokens=1000
         )
-        
-        # Collect all chunks from the streaming response
-        full_content = ""
-        try:
-            for chunk in response:
-                # Handle different response formats from Together API
-                if isinstance(chunk, tuple):
-                    # If chunk is a tuple, try to extract content from it
-                    chunk_data = chunk[1] if len(chunk) > 1 else chunk[0]
-                    if hasattr(chunk_data, 'choices'):
-                        choices = chunk_data.choices
-                    else:
-                        continue
-                else:
-                    # Standard chunk format
-                    choices = getattr(chunk, 'choices', None)
-                
-                if choices and len(choices) > 0:
-                    delta = getattr(choices[0], 'delta', None)
-                    if delta and hasattr(delta, 'content') and delta.content:
-                        full_content += delta.content
-        except Exception as stream_error:
-            logging.warning(f"Error processing stream: {stream_error}")
-        
-        if full_content.strip():
-            return full_content.strip()
-        else:
-            raise RuntimeError("No content received from AI service.")
+        return response.choices[0].message.content
     except httpx.HTTPStatusError as e:    
         logging.error(f"HTTP error occurred: {e}")
-        status = getattr(getattr(e, "response", None), "status_code", "unknown")
-        raise RuntimeError(
-            f"Sorry, I encountered an error with the AI service: {status}"
-        )
+        raise f"Sorry, I encountered an error with the AI service: {e.response.status_code}"
     except Exception as e:
         logging.error(f"An unexpected error occurred: {e}")
-        raise RuntimeError(
-            "Sorry, I encountered an unexpected error. "
-            "Please try again later."
-        )
-
-
+        raise f"Sorry, I encountered an unexpected error. Please try again later."
 async def process_chat_message(message: str) -> str:
-    """Routes the user's message to the correct service."""
+    """
+    The main async handler function. It routes the user's message to the correct service.
+    """
     if message.lower().startswith("improve my prompt:"):
         user_prompt = message[len("improve my prompt:"):].strip()
         logging.info(f"Async: Improving prompt: {user_prompt}") 
