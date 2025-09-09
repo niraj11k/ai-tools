@@ -1,7 +1,7 @@
 [tool.black]
 line-length = 250
 target-version = ["py310", "py311", "py312"]
-extend-exclude = '(venv|\.venv|build|dist|\.devcontainer|\.github)'
+extend-exclude = '(venv|\.venv|build|dist|\.devcontainer|\.github|app)'
 
 [tool.ruff]
 fix = true
