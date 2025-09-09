@@ -47,13 +47,13 @@
           body: JSON.stringify({ task, provider })
         });
         const data = await response.json();
-        const output = data.prompt || data.error || "❌ Unexpected error";
+        let output = data.prompt || data.error || "❌ Unexpected error";
         // Remove "Review and Optimization:" and everything after it
         // Remove "Review" and everything after it, if present
         const reviewMatch = output.match(/Review[\s\S]*/);
         if (reviewMatch) {
           output = output.substring(0, reviewMatch.index).trim();
-        }        
+        }
         showLoadingAndResult(output);
       } catch (err) {
         resultPre.innerText = "❌ Unable to reach server. Check console.";
@@ -83,8 +83,8 @@
 		  const data = await response.json();
 		  let output = data.prompt || data.error || "❌ Unexpected error";
 		  showLoadingAndResult(output);
-	  } catch (err) {
-		  resultElement.innerText = "❌ Unable to reach server. Check console.";
+  } catch (err) {
+		  resultPre.innerText = "❌ Unable to reach server. Check console.";
 		  console.error(err);
 	  } finally {
 		  loadingSpinner.classList.add('hidden');
@@ -117,7 +117,7 @@
   const chatbotInput = document.getElementById('chatbot-input');
   const chatbotBody = document.getElementById('chatbot-body');
   const predefinedServicesContainer = document.getElementById('predefined-services');
-  API_BASE_URL = window.location.origin;
+  const API_BASE_URL = window.location.origin;
 
   const toggleChatbot = () => {
     chatbotWindow.classList.toggle('hidden-chatbot');
@@ -132,8 +132,8 @@
     const messageDiv = document.createElement('div');
     messageDiv.className = `chatbot-message ${sender}-message`;
 
-    if (sender === 'bot') {
-        messageDiv.innerHTML = marked.parse(text);
+    if (sender === 'bot' && window.marked && typeof window.marked.parse === 'function') {
+        messageDiv.innerHTML = window.marked.parse(text);
     } else {
         messageDiv.textContent = text;
     }

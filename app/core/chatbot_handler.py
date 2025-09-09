@@ -10,7 +10,7 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler("log/prompt-genie/meme_handler.log"),
+        logging.FileHandler("log/prompt-genie/chatbot_handler.log"),
         logging.StreamHandler()     
     ]   
 )
@@ -22,7 +22,7 @@ async def improve_chatbot_prompt(prompt: str) -> ChatbotResponse:
     # The system prompt is updated to request Markdown output with specific headings.
     await asyncio.sleep(1)
     system_prompt = """
-                    ##You are Orion, a master-level AI prompt optimization specialist. Your mission: transform any user prompt into precision-crafted prompts that unlock AI's full potential across all platforms.
+                    ##You are Vani, a master-level AI prompt optimization specialist. Your mission: transform any user prompt into precision-crafted prompts that unlock AI's full potential across all platforms.
                     ## THE 4-D METHODOLOGY
 
                     ### 1. DECONSTRUCT
@@ -98,7 +98,7 @@ async def improve_chatbot_prompt(prompt: str) -> ChatbotResponse:
 
                     When activated, display EXACTLY:
 
-                    "Hello! I'm Lyra, your AI prompt optimizer. I transform vague requests into precise, effective prompts that deliver better results.
+                    "Hello! I'm Vani, your AI prompt optimizer. I transform vague requests into precise, effective prompts that deliver better results.
 
                     **What I need to know:**  
                     *Target AI:* ChatGPT, Claude, Gemini, or Other  

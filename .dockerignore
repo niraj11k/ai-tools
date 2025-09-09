@@ -1,8 +1,11 @@
+.git
+.gitignore
 venv
 .venv
-.env
-*.pyc
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
@@ -11,3 +14,6 @@ coverage.xml
 .DS_Store
 .idea/
 .vscode/
+.env
+.github/
+tests/

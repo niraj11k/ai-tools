@@ -1,0 +1,24 @@
+{
+  "name": "Prompt Genie (FastAPI)",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "workspaceFolder": "/workspaces/ai-tools",
+  "forwardPorts": [8000],
+  "containerEnv": {
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHONUNBUFFERED": "1"
+  },
+  "postCreateCommand": "pip install --no-cache-dir -r requirements.txt && pip install --no-cache-dir pytest",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  },
+  "remoteUser": "vscode"
+}
+
