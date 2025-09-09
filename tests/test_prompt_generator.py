@@ -7,7 +7,7 @@ def test_create_prompt_unknown_provider():
 
 
 def test_create_prompt_llama_success(monkeypatch):
-    # Ensure API key present for _require_api_key
+    # Ensure API key present for _require_api_key in env file
     monkeypatch.setenv("TOGETHER_API_KEY", "test-key")
     pg.TOGETHER_API_KEY = "test-key"
 
