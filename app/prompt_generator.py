@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 import requests
 from together import Together
 
-
 load_dotenv()
 client = Together()  # Uses TOGETHER_API_KEY from environment
 
