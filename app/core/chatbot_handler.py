@@ -15,8 +15,35 @@ logging.basicConfig(
     ]   
 )
 
-# load_dotenv()
 client = Together()  # Uses TOGETHER_API_KEY from environment
+
+
+def _safe_extract_content(response) -> str:
+    """Best-effort extraction of text from Together SDK responses.
+    Avoids subscripting None when choices/message may be missing.
+    """
+    try:
+        choices = getattr(response, "choices", None)
+        if choices:
+            first = choices[0]
+            msg = getattr(first, "message", None)
+            if msg and getattr(msg, "content", None):
+                return msg.content
+            if getattr(first, "text", None):
+                return first.text
+        if isinstance(response, dict):
+            ch = response.get("choices")
+            if ch and isinstance(ch, list):
+                first = ch[0]
+                if isinstance(first, dict):
+                    msg = first.get("message") or {}
+                    if isinstance(msg, dict) and msg.get("content"):
+                        return msg["content"]
+                    if first.get("text"):
+                        return first["text"]
+        return ""
+    except Exception:
+        return ""
 
 async def improve_chatbot_prompt(prompt: str) -> ChatbotResponse:   
     # The system prompt is updated to request Markdown output with specific headings.
@@ -131,7 +158,7 @@ async def improve_chatbot_prompt(prompt: str) -> ChatbotResponse:
             ],
             # max_tokens=1000
         )
-        return response.choices[0].message.content
+        return _safe_extract_content(response)
     except httpx.HTTPStatusError as e:
         logging.error(f"HTTP error occurred: {e}")
         raise f"Sorry, I encountered an error with the AI service: {e.response.status_code}"
@@ -151,13 +178,13 @@ async def ask_gpt(question: str) -> ChatbotResponse:
     await asyncio.sleep(0.5) # Simulates network delay
     try:
         response = client.chat.completions.create(
-            model="meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
+            model="openai/gpt-oss-20b",
             messages=[
                 {"role": "system", "content": question },
             ],
             max_tokens=1000
         )
-        return response.choices[0].message.content
+        return _safe_extract_content(response)
     except httpx.HTTPStatusError as e:    
         logging.error(f"HTTP error occurred: {e}")
         raise f"Sorry, I encountered an error with the AI service: {e.response.status_code}"

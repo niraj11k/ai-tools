@@ -30,7 +30,7 @@ def create_prompt(task_description: str, provider: str) -> str:
     )
 
     try:
-        if provider == "openAI":
+        if provider == "openai":
             response = client.chat.completions.create(
                 model="openai/gpt-oss-20b",
                 messages=[
@@ -79,7 +79,7 @@ def create_prompt(task_description: str, provider: str) -> str:
 def create_short_prompt(task_description: str, provider: str) -> str:
     provider = provider.lower()
     try:
-        if provider == "openAI":
+        if provider == "openai":
             response = client.chat.completions.create(
                 model="openai/gpt-oss-20b",
                 messages=[
