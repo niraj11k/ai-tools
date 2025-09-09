@@ -20,7 +20,7 @@ async def handle_chat_request(chat_request: ChatbotRequest):
     
     # Log the user's message and Lyra's reply
     print(f"User: {chat_request.message}")
-    print(f"Lyra: {reply_text}")    
+    print(f"Vani: {reply_text}")    
     
     # Return the response in the format defined by ChatResponse
     return ChatbotResponse(reply=reply_text)

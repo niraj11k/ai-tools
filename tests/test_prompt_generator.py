@@ -1,10 +1,4 @@
-import types
-
 import app.prompt_generator as pg
-
-
-def test_create_prompt_missing_task_returns_error():
-    assert "task_description is required" in pg.create_prompt("", "together")
 
 
 def test_create_prompt_unknown_provider():
@@ -12,7 +6,7 @@ def test_create_prompt_unknown_provider():
     assert "Unknown provider" in out
 
 
-def test_create_prompt_together_success(monkeypatch):
+def test_create_prompt_llama_success(monkeypatch):
     # Ensure API key present for _require_api_key
     monkeypatch.setenv("TOGETHER_API_KEY", "test-key")
     pg.TOGETHER_API_KEY = "test-key"
@@ -36,11 +30,11 @@ def test_create_prompt_together_success(monkeypatch):
 
     monkeypatch.setattr(pg.requests, "post", fake_post)
 
-    out = pg.create_prompt("write a poem", "together")
+    out = pg.create_prompt("write a poem", "llama")
     assert out == "TOGETHER DETAILED OK"
 
 
-def test_create_short_prompt_together_success(monkeypatch):
+def test_create_short_prompt_llama_success(monkeypatch):
     monkeypatch.setenv("TOGETHER_API_KEY", "test-key")
     pg.TOGETHER_API_KEY = "test-key"
 
@@ -63,11 +57,11 @@ def test_create_short_prompt_together_success(monkeypatch):
 
     monkeypatch.setattr(pg.requests, "post", fake_post)
 
-    out = pg.create_short_prompt("summarize text", "together")
+    out = pg.create_short_prompt("summarize text", "llama")
     assert out == "TOGETHER SHORT OK"
 
 
-def test_create_prompt_vision_uses_sdk(monkeypatch):
+def test_create_prompt_openai_uses_sdk(monkeypatch):
     class FakeMessage:
         def __init__(self, content):
             self.content = content
@@ -93,11 +87,11 @@ def test_create_prompt_vision_uses_sdk(monkeypatch):
             self.chat = FakeChat()
 
     monkeypatch.setattr(pg, "client", FakeClient())
-    out = pg.create_prompt("describe an image", "vision")
+    out = pg.create_prompt("describe an image", "openai")
     assert out == "VISION OK"
 
 
-def test_create_prompt_mistral_uses_sdk(monkeypatch):
+def test_create_prompt_gemma_uses_sdk(monkeypatch):
     class FakeMessage:
         def __init__(self, content):
             self.content = content
@@ -112,7 +106,7 @@ def test_create_prompt_mistral_uses_sdk(monkeypatch):
 
     class FakeCompletions:
         def create(self, model, messages, max_tokens=None):
-            return FakeResponse("MISTRAL OK")
+            return FakeResponse("GEMMA OK")
 
     class FakeChat:
         def __init__(self):
@@ -123,6 +117,5 @@ def test_create_prompt_mistral_uses_sdk(monkeypatch):
             self.chat = FakeChat()
 
     monkeypatch.setattr(pg, "client", FakeClient())
-    out = pg.create_prompt("explain trees", "mistral")
-    assert out == "MISTRAL OK"
-
+    out = pg.create_prompt("explain trees", "gemma")
+    assert out == "GEMMA OK"

@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from app.prompt_generator import create_prompt ,create_short_prompt
+from app.api.chatbot_routes import router as chatbot_router
 import os
 
 # load_dotenv()  # Load .env variables
@@ -39,6 +40,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
+app.include_router(chatbot_router, prefix="/api")
 
 # Templates
 templates = Jinja2Templates(directory="templates")

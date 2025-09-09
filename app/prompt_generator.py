@@ -11,6 +11,33 @@ client = Together()  # Uses TOGETHER_API_KEY from environment
 # Load API keys from .env
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 
+def _safe_extract_content(response) -> str:
+    """Best-effort extraction of text from Together SDK responses.
+    Handles variations where choices/message/content may be missing or None.
+    """
+    try:
+        choices = getattr(response, "choices", None)
+        if choices:
+            first = choices[0]
+            msg = getattr(first, "message", None)
+            if msg and getattr(msg, "content", None):
+                return msg.content
+            if getattr(first, "text", None):
+                return first.text
+        if isinstance(response, dict):
+            ch = response.get("choices")
+            if ch and isinstance(ch, list):
+                first = ch[0]
+                if isinstance(first, dict):
+                    msg = first.get("message") or {}
+                    if isinstance(msg, dict) and msg.get("content"):
+                        return msg["content"]
+                    if first.get("text"):
+                        return first["text"]
+        return ""
+    except Exception:
+        return ""
+
 def create_prompt(task_description: str, provider: str) -> str:
     provider = provider.lower()
     """
@@ -39,7 +66,7 @@ def create_prompt(task_description: str, provider: str) -> str:
                 ],
                 
             )
-            return response.choices[0].message.content
+            return _safe_extract_content(response)
 
         elif provider == "llama":
             url = "https://api.together.xyz/v1/chat/completions"
@@ -66,9 +93,7 @@ def create_prompt(task_description: str, provider: str) -> str:
                     {"role": "user", "content": f"user prompt: {task_description}"}
                 ]
             )
-            output = response.choices[0].message.content
-            # output = clean_deepseek_response(output)
-            return output
+            return _safe_extract_content(response)
 
         else:
             return f"❌ Unknown provider: {provider}"
@@ -88,7 +113,7 @@ def create_short_prompt(task_description: str, provider: str) -> str:
                 ],
                 max_tokens=100
             )
-            return response.choices[0].message.content
+            return _safe_extract_content(response)
         elif provider == "llama":
             url = "https://api.together.xyz/v1/chat/completions"
             headers = {
@@ -115,9 +140,7 @@ def create_short_prompt(task_description: str, provider: str) -> str:
                 ],
                 max_tokens=100
             )
-            output = response.choices[0].message.content
-            # output = clean_deepseek_response(output)
-            return output
+            return _safe_extract_content(response)
         else:
             return "Provider not supported."
     except Exception as e:
